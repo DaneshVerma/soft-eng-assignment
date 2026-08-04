@@ -38,7 +38,7 @@ class UserService:
 
     @staticmethod
     def get_user_by_id(user_id):
-        user = User.query.get(user_id)
+        user = db.session.get(User, user_id)
         if not user:
             raise NotFoundError("User not found")
         return user

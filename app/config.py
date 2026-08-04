@@ -16,6 +16,7 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     """Testing configuration."""
     TESTING = True
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     
 class ProductionConfig(Config):
     """Production configuration."""

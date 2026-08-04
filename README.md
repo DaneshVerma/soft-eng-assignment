@@ -35,3 +35,10 @@ To generate a new migration after modifying models:
 flask db migrate -m "Description of changes"
 flask db upgrade
 ```
+
+## Testing
+
+To run the automated API tests with `pytest`:
+```bash
+pytest
+```

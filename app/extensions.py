@@ -8,7 +8,12 @@ migrate = Migrate()
 jwt = JWTManager()
 
 def init_extensions(app: Flask) -> None:
-    """Initialize Flask extensions."""
+    """
+    Initialize all Flask extensions.
+
+    Args:
+        app: The Flask application instance.
+    """
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)

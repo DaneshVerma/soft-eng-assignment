@@ -1,40 +1,50 @@
-from flask import jsonify
+from flask import Flask, Response
 from werkzeug.exceptions import HTTPException
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from app.utils.responses import error_response
 
 class APIError(Exception):
-    def __init__(self, message, status_code=400):
+    """Base class for all API-related exceptions."""
+    def __init__(self, message: str, status_code: int = 400) -> None:
         super().__init__()
         self.message = message
         self.status_code = status_code
 
 class ValidationError(APIError):
-    def __init__(self, message):
+    """Exception raised when input validation fails."""
+    def __init__(self, message: str) -> None:
         super().__init__(message, status_code=400)
 
 class NotFoundError(APIError):
-    def __init__(self, message):
+    """Exception raised when a requested resource is not found."""
+    def __init__(self, message: str) -> None:
         super().__init__(message, status_code=404)
 
-def register_error_handlers(app):
+def register_error_handlers(app: Flask) -> None:
+    """
+    Register all centralized error handlers for the Flask application.
+
+    Args:
+        app: The Flask application instance.
+    """
     @app.errorhandler(APIError)
-    def handle_api_error(error):
-        return jsonify({"success": False, "error": error.message}), error.status_code
+    def handle_api_error(error: APIError) -> tuple[Response, int]:
+        return error_response(error.message, error.status_code)
 
     @app.errorhandler(IntegrityError)
-    def handle_integrity_error(error):
+    def handle_integrity_error(error: IntegrityError) -> tuple[Response, int]:
         # We try to handle duplicate data before getting here, but this is a safety net
-        return jsonify({"success": False, "error": "Database integrity error, possibly duplicate data"}), 400
+        return error_response("Database integrity error, possibly duplicate data", 400)
 
     @app.errorhandler(SQLAlchemyError)
-    def handle_database_error(error):
-        return jsonify({"success": False, "error": "A database error occurred"}), 500
+    def handle_database_error(error: SQLAlchemyError) -> tuple[Response, int]:
+        return error_response("A database error occurred", 500)
 
     @app.errorhandler(HTTPException)
-    def handle_http_exception(error):
+    def handle_http_exception(error: HTTPException) -> tuple[Response, int]:
         # This catches 400 Bad Request (e.g. malformed JSON when using request.get_json())
-        return jsonify({"success": False, "error": error.description}), error.code
+        return error_response(str(error.description), error.code or 500)
 
     @app.errorhandler(Exception)
-    def handle_generic_exception(error):
-        return jsonify({"success": False, "error": "An unexpected error occurred"}), 500
+    def handle_generic_exception(error: Exception) -> tuple[Response, int]:
+        return error_response("An unexpected error occurred", 500)

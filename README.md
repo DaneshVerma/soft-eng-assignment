@@ -268,8 +268,10 @@ The test suite utilizes an isolated in-memory SQLite database to ensure the deve
 
 ## AI Usage Declaration
 
-**AI Tools Used**: Google Deepmind's Agentic AI Assistant
+**AI Tools Used**: Google Deepmind's Agentic AI Assistant (Antigravity) & OpenAi's ChatGPT(GPT-5.5)
+
 **What AI Generated**: The entirety of the codebase was scaffolded and implemented by AI following constraints provided via prompts. This includes the application factory setup, model configuration, service/route separation, validation logic, Pytest cases, centralized error handlers, and this README documentation.
+
 **What was Manually Modified**: The AI acted autonomously to create the code. Explicit design requirements, architecture constraints, and testing criteria were specified by the developer to guide the AI's generation.
 
 ---

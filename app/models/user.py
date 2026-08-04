@@ -13,3 +13,13 @@ class User(db.Model):
 
     def __repr__(self) -> str:
         return f"<User {self.name} ({self.email})>"
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "email": self.email,
+            "role": self.role,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None
+        }

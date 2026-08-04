@@ -18,8 +18,20 @@ class UserService:
             raise Exception(str(e))
 
     @staticmethod
-    def get_all_users():
-        return User.query.all()
+    def get_all_users(page=1, limit=10, search=None):
+        query = User.query
+
+        if search:
+            from sqlalchemy import or_
+            search_term = f"%{search}%"
+            query = query.filter(
+                or_(
+                    User.name.ilike(search_term),
+                    User.email.ilike(search_term)
+                )
+            )
+
+        return query.paginate(page=page, per_page=limit, error_out=False)
 
     @staticmethod
     def get_user_by_id(user_id):

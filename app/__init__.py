@@ -9,6 +9,9 @@ def create_app(config_class=Config) -> Flask:
 
     init_extensions(app)
 
+    # Register models
+    from app import models
+
     @app.route("/", methods=["GET"])
     def health_check():
         return jsonify({

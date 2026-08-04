@@ -1,7 +1,11 @@
+from typing import Any
 from datetime import datetime
 from app.extensions import db
 
-class User(db.Model):
+class User(db.Model): # type: ignore
+    """
+    User database model representing the 'users' table.
+    """
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -15,7 +19,13 @@ class User(db.Model):
     def __repr__(self) -> str:
         return f"<User {self.name} ({self.email})>"
 
-    def to_dict(self):
+    def to_dict(self) -> dict[str, Any]:
+        """
+        Convert the User instance to a dictionary.
+
+        Returns:
+            A dictionary containing the user's data (excluding the password hash).
+        """
         return {
             "id": self.id,
             "name": self.name,

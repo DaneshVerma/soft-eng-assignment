@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
 from app.config import Config
 from app.extensions import init_extensions
+from app.errors import register_error_handlers
 
 def create_app(config_class=Config) -> Flask:
     """Create and configure the Flask application."""
@@ -8,6 +9,7 @@ def create_app(config_class=Config) -> Flask:
     app.config.from_object(config_class)
 
     init_extensions(app)
+    register_error_handlers(app)
 
     # Register models
     from app import models

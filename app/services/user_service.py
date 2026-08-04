@@ -1,21 +1,24 @@
 from app.extensions import db
 from app.models.user import User
+from app.errors import ValidationError, NotFoundError
+from app.utils.validation import validate_user_data
 
 class UserService:
     @staticmethod
     def create_user(data):
-        try:
-            new_user = User(
-                name=data.get('name'),
-                email=data.get('email'),
-                role=data.get('role')
-            )
-            db.session.add(new_user)
-            db.session.commit()
-            return new_user
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(str(e))
+        validate_user_data(data)
+
+        if User.query.filter_by(email=data.get('email')).first():
+            raise ValidationError("Email already registered")
+
+        new_user = User(
+            name=data.get('name'),
+            email=data.get('email'),
+            role=data.get('role')
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        return new_user
 
     @staticmethod
     def get_all_users(page=1, limit=10, search=None):
@@ -35,4 +38,7 @@ class UserService:
 
     @staticmethod
     def get_user_by_id(user_id):
-        return User.query.get(user_id)
+        user = User.query.get(user_id)
+        if not user:
+            raise NotFoundError("User not found")
+        return user

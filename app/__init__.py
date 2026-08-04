@@ -16,7 +16,10 @@ def create_app(config_class=Config) -> Flask:
 
     # Register blueprints
     from app.routes.user_routes import user_bp
+    from app.routes.auth_routes import auth_bp
+    
     app.register_blueprint(user_bp)
+    app.register_blueprint(auth_bp)
 
     @app.route("/", methods=["GET"])
     def health_check():

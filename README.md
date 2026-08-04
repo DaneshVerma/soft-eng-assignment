@@ -59,6 +59,7 @@ Copy the example environment file and update it with your own credentials:
 cp .env.example .env
 ```
 Ensure the `DATABASE_URL` is configured to point to your MySQL or SQLite instance.
+Also ensure you set `JWT_SECRET_KEY` to a secure random string (at least 32 characters long) for JWT token generation.
 
 ## Database Setup & Migration Commands
 
@@ -101,6 +102,57 @@ The test suite utilizes an isolated in-memory SQLite database to ensure the deve
 ---
 
 ## API Documentation
+
+> **Note on Authentication**: All `/users` endpoints are protected and require a valid JWT token in the `Authorization` header: `Authorization: Bearer <your_token>`.
+
+### Authentication
+
+#### Register a New User
+- **Endpoint**: `POST /auth/register`
+- **Description**: Registers a user and securely hashes their password.
+- **Example Request**:
+  ```json
+  POST /auth/register
+  Content-Type: application/json
+
+  {
+      "name": "Jane Doe",
+      "email": "jane@example.com",
+      "password": "password123",
+      "role": "user"
+  }
+  ```
+
+#### Login
+- **Endpoint**: `POST /auth/login`
+- **Description**: Authenticates a user and returns a JWT access token.
+- **Example Request**:
+  ```json
+  POST /auth/login
+  Content-Type: application/json
+
+  {
+      "email": "jane@example.com",
+      "password": "password123"
+  }
+  ```
+- **Example Response** (200 OK):
+  ```json
+  {
+      "success": true,
+      "data": {
+          "token": "eyJhbGciOiJIUzI1NiIs...",
+          "user": {
+              "id": 1,
+              "name": "Jane Doe",
+              "email": "jane@example.com",
+              "role": "user",
+              "created_at": "...",
+              "updated_at": "..."
+          }
+      }
+  }
+  ```
 
 ### 1. Create a User
 - **Endpoint**: `POST /users`
@@ -202,6 +254,7 @@ The test suite utilizes an isolated in-memory SQLite database to ensure the deve
 | `id`         | Integer      | Primary Key, Auto-increment                |
 | `name`       | String(100)  | Not Null                                   |
 | `email`      | String(120)  | Not Null, Unique                           |
+| `password_hash` | String(128)  | Not Null                                   |
 | `role`       | String(50)   | Not Null                                   |
 | `created_at` | DateTime     | Not Null, Default: Current UTC timestamp   |
 | `updated_at` | DateTime     | Not Null, Default/On Update: UTC timestamp |
@@ -211,7 +264,6 @@ The test suite utilizes an isolated in-memory SQLite database to ensure the deve
 ## Assumptions Made
 - The application focuses strictly on a standard REST API response format (`success` and `data`/`error` keys).
 - For local execution without an active MySQL server, a SQLite fallback (`sqlite:///app.db`) is configured to ensure seamless developer onboarding and immediate runnable state.
-- Authentication (like JWT) is intentionally excluded per project constraints, prioritizing robust basic validation and structure over access control.
 - Pagination is implemented using offset/limit mechanics standard to SQLAlchemy, which is suitable for standard traffic expectations.
 
 ## AI Usage Declaration
@@ -235,6 +287,6 @@ Flask is a lightweight, extensible micro-framework perfectly suited for building
 ### 3. Production improvements?
 - **Dockerization (Completed)**: The application has successfully been wrapped in a `Dockerfile` and orchestrated via Docker Compose, fulfilling the initial need for containerization and environment parity. Next steps would involve Kubernetes for larger scale.
 - **Server Infrastructure**: The built-in Flask server is not designed for production traffic. A robust WSGI server like `Gunicorn` (with `gevent` or threaded workers) managed by a reverse proxy (`NGINX`) must be used.
-- **Security**: Integrating authentication (JWT/OAuth), rate limiting (e.g., Flask-Limiter), and robust CORS headers are vital production necessities.
+- **Security (Completed)**: Authentication via JWT (Flask-JWT-Extended) and password hashing (bcrypt) has been successfully integrated. Further enhancements would include rate limiting (e.g., Flask-Limiter) and robust CORS headers.
 - **Observability**: Adding structured logging, Prometheus metrics, and APM tracing (like DataDog or Sentry) is required to monitor exceptions and endpoint performance in real-time.
 - **Database Migrations**: In production, migrations should be strictly automated as part of a CI/CD pipeline, avoiding manual `flask db upgrade` execution.

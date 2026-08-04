@@ -1,9 +1,11 @@
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required
 from app.services.user_service import UserService
 
 user_bp = Blueprint('users', __name__, url_prefix='/users')
 
 @user_bp.route('', methods=['POST'])
+@jwt_required()
 def create_user():
     data = request.get_json()
     user = UserService.create_user(data)
@@ -13,6 +15,7 @@ def create_user():
     }), 201
 
 @user_bp.route('', methods=['GET'])
+@jwt_required()
 def get_users():
     page = request.args.get('page', 1, type=int)
     limit = request.args.get('limit', 10, type=int)
@@ -30,6 +33,7 @@ def get_users():
     }), 200
 
 @user_bp.route('/<int:user_id>', methods=['GET'])
+@jwt_required()
 def get_user(user_id):
     user = UserService.get_user_by_id(user_id)
     return jsonify({

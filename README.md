@@ -76,7 +76,15 @@ flask db upgrade
 
 ## Running the Application
 
-To start the development server:
+### Using Docker (Recommended)
+To start the application and the MySQL database in isolated containers, use Docker Compose:
+```bash
+docker compose up -d --build
+```
+This automatically runs database migrations and maps the API to `http://127.0.0.1:5000`.
+
+### Local Development Server
+To start the development server natively (requires setting up your own database):
 ```bash
 python run.py
 ```
@@ -225,8 +233,8 @@ Flask is a lightweight, extensible micro-framework perfectly suited for building
 - **Pagination**: The current offset-based pagination could become slow on extremely large datasets. It would be migrated to cursor-based pagination (keyset pagination) for better scaling on deep pages.
 
 ### 3. Production improvements?
+- **Dockerization (Completed)**: The application has successfully been wrapped in a `Dockerfile` and orchestrated via Docker Compose, fulfilling the initial need for containerization and environment parity. Next steps would involve Kubernetes for larger scale.
 - **Server Infrastructure**: The built-in Flask server is not designed for production traffic. A robust WSGI server like `Gunicorn` (with `gevent` or threaded workers) managed by a reverse proxy (`NGINX`) must be used.
-- **Dockerization**: Wrapping the application in a `Dockerfile` and orchestrating it via Kubernetes or Docker Compose ensures parity between environments.
 - **Security**: Integrating authentication (JWT/OAuth), rate limiting (e.g., Flask-Limiter), and robust CORS headers are vital production necessities.
 - **Observability**: Adding structured logging, Prometheus metrics, and APM tracing (like DataDog or Sentry) is required to monitor exceptions and endpoint performance in real-time.
 - **Database Migrations**: In production, migrations should be strictly automated as part of a CI/CD pipeline, avoiding manual `flask db upgrade` execution.

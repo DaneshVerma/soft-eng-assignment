@@ -1,6 +1,6 @@
 from typing import Any
 from flask import Blueprint, request, Response
-from app.services.auth_service import AuthService
+from app.services import AuthService , UserService
 from app.utils.responses import success_response
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
